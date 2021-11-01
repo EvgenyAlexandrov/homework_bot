@@ -45,9 +45,9 @@ def get_api_answer(url, current_timestamp):
 
 def parse_status(homework):
     """Достает данные из домашки, проверяет и возвращает сообщение."""
-    status = homework.get('status')
+    status = homework[0]['status']
     verdict = HOMEWORK_STATUSES[status]
-    homework_name = homework['homework_name']
+    homework_name = homework[0]['homework_name']
     if homework_name is None:
         raise Exception('Нет имени домашки')
     if verdict is None:
@@ -86,10 +86,10 @@ def main():
     if PRACTICUM_TOKEN is None:
         logging.error('Нет токена практикума')
         raise Exception('Нет токена практикума')
-    bot = telegram.ext.Bot(token=TELEGRAM_TOKEN)
+    bot = telegram.Bot(token=TELEGRAM_TOKEN)
     updater = Updater(token=TELEGRAM_TOKEN)
-    current_timestamp = int(time.time())
-    response = get_api_answer(ENDPOINT, current_timestamp)
+    # current_timestamp = int(time.time())
+    response = get_api_answer(ENDPOINT, 1633103140)
     homework = check_response(response)
     message = parse_status(homework)
     updater.dispatcher.add_handler(
