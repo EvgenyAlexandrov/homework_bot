@@ -45,9 +45,9 @@ def get_api_answer(url, current_timestamp):
 
 def parse_status(homework):
     """Достает данные из домашки, проверяет и возвращает сообщение."""
-    status = homework[0]['status']
+    status = homework['status']
     verdict = HOMEWORK_STATUSES[status]
-    homework_name = homework[0]['homework_name']
+    homework_name = homework['homework_name']
     if homework_name is None:
         raise Exception('Нет имени домашки')
     if verdict is None:
