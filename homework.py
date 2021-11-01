@@ -88,8 +88,8 @@ def main():
         raise Exception('Нет токена практикума')
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     updater = Updater(token=TELEGRAM_TOKEN)
-    # current_timestamp = int(time.time())
-    response = get_api_answer(ENDPOINT, 1633103140)
+    current_timestamp = int(time.time())
+    response = get_api_answer(ENDPOINT, current_timestamp)
     homework = check_response(response)
     message = parse_status(homework)
     updater.dispatcher.add_handler(
