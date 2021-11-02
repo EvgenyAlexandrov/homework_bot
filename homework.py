@@ -54,14 +54,15 @@ def get_api_answer(url, current_timestamp):
     except requests.exceptions.RequestException:
         logger.error('Ошибка сети')
         raise Exception('Сетевая ошибка')
+    print(homework_statuses.json())
     return homework_statuses.json()
 
 
 def parse_status(homework):
     """Достает данные из домашки, проверяет и возвращает сообщение."""
-    status = homework['status']
+    status = homework[0]['status']
     verdict = HOMEWORK_STATUSES[status]
-    homework_name = homework['homework_name']
+    homework_name = homework[0]['homework_name']
     if homework_name is None:
         logger.error('Нет имени домашки')
         raise Exception('Нет имени домашки')
@@ -81,9 +82,6 @@ def check_response(response):
         logger.error("Нет списка 'homeworks'")
         raise Exception("Нет списка 'homeworks'")
     status = homeworks[0]['status']
-    if not status:
-        logger.error('Нет статуса')
-        raise Exception("Нет статуса")
     if status not in HOMEWORK_STATUSES:
         logger.error('Статуст домашки неверен')
         raise Exception("Неправильный статус")
