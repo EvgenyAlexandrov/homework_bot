@@ -74,15 +74,15 @@ def parse_status(homework):
 def check_response(response):
     """Проверяет полученный ответ на корректность,и не изменился ли статус."""
     homeworks = response.get('homeworks')
-    print(homeworks)
     if not isinstance(homeworks, list):
         logger.error("Неверный формат 'homeworks'")
         raise Exception("Неверный формат 'homeworks'")
     if not homeworks:
-        logger.error("Нет списка 'homeworks'")
         return None
     homeworks = homeworks[0]
     status = homeworks['status']
+    if not status:
+        return None
     if status not in HOMEWORK_STATUSES:
         logger.error('Статуст домашки неверен')
         raise Exception("Неправильный статус")
