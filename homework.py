@@ -6,6 +6,7 @@ import time
 
 from dotenv import load_dotenv
 from telegram.ext import Updater, CommandHandler
+from logging.handlers import RotatingFileHandler
 
 load_dotenv()
 
@@ -22,6 +23,19 @@ HOMEWORK_STATUSES = {
     'rejected': 'Работа проверена, в ней нашлись ошибки.'
 }
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = RotatingFileHandler('my_logger.log',
+                              maxBytes=50000000,
+                              backupCount=5,
+                              encoding='utf-8')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 
 def send_message(bot, message):
     """Отправляет сообщение."""
@@ -35,10 +49,10 @@ def get_api_answer(url, current_timestamp):
     try:
         homework_statuses = requests.get(url, headers=headers, params=payload)
         if homework_statuses.status_code != 200:
-            logging.error('Нет ответа от сервера')
+            logger.error('Нет ответа от сервера')
             raise Exception('Ответа нет')
     except requests.exceptions.RequestException:
-        logging.error('Ошибка сети')
+        logger.error('Ошибка сети')
         raise Exception('Сетевая ошибка')
     return homework_statuses.json()
 
@@ -49,9 +63,10 @@ def parse_status(homework):
     verdict = HOMEWORK_STATUSES[status]
     homework_name = homework['homework_name']
     if homework_name is None:
+        logger.error('Нет имени домашки')
         raise Exception('Нет имени домашки')
     if verdict is None:
-        logging.info(f'Вердикт: {verdict}')
+        logger.info(f'Вердикт: {verdict}')
         raise Exception('Нет результата')
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
@@ -59,18 +74,18 @@ def parse_status(homework):
 def check_response(response):
     """Проверяет полученный ответ на корректность,и не изменился ли статус."""
     homeworks = response.get('homeworks')
-    if homeworks == []:
-        logging.error('Задания списка домашки')
-        raise Exception("Нет списка 'homework'")
     if not isinstance(homeworks, list):
-        logging.error("Неверный формат 'homework'")
-        raise Exception("Неверный формат 'homework'")
+        logger.error("Неверный формат 'homeworks'")
+        raise Exception("Неверный формат 'homeworks'")
     if not homeworks:
-        logging.error('Нет ключа "homeworks"')
-        raise Exception('Нет ключа "homeworks"')
+        logger.error("Нет списка 'homeworks'")
+        raise Exception("Нет списка 'homeworks'")
     status = homeworks[0]['status']
+    if not status:
+        logger.error('Нет статуса')
+        raise Exception("Нет статуса")
     if status not in HOMEWORK_STATUSES:
-        logging.error('Статуст домашки неверен')
+        logger.error('Статуст домашки неверен')
         raise Exception("Неправильный статус")
     return homeworks
 
@@ -78,13 +93,13 @@ def check_response(response):
 def main():
     """Проверяет токены, запускает функции с выставлением таймера."""
     if TELEGRAM_CHAT_ID is None:
-        logging.error('Нет id чата')
+        logger.error('Нет id чата')
         raise Exception('Нет id чата')
     if TELEGRAM_TOKEN is None:
-        logging.error('Нет токена бота')
+        logger.error('Нет токена бота')
         raise Exception('Нет токена бота')
     if PRACTICUM_TOKEN is None:
-        logging.error('Нет токена практикума')
+        logger.error('Нет токена практикума')
         raise Exception('Нет токена практикума')
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     updater = Updater(token=TELEGRAM_TOKEN)
@@ -101,7 +116,7 @@ def main():
             time.sleep(RETRY_TIME)
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
-            logging.error(message)
+            logger.error(message)
             time.sleep(RETRY_TIME)
             continue
 
