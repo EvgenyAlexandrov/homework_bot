@@ -54,15 +54,14 @@ def get_api_answer(url, current_timestamp):
     except requests.exceptions.RequestException:
         logger.error('Ошибка сети')
         raise Exception('Сетевая ошибка')
-    print(homework_statuses.json())
     return homework_statuses.json()
 
 
 def parse_status(homework):
     """Достает данные из домашки, проверяет и возвращает сообщение."""
-    status = homework[0]['status']
+    status = homework['status']
     verdict = HOMEWORK_STATUSES[status]
-    homework_name = homework[0]['homework_name']
+    homework_name = homework['homework_name']
     if homework_name is None:
         logger.error('Нет имени домашки')
         raise Exception('Нет имени домашки')
@@ -75,13 +74,15 @@ def parse_status(homework):
 def check_response(response):
     """Проверяет полученный ответ на корректность,и не изменился ли статус."""
     homeworks = response.get('homeworks')
+    print(homeworks)
     if not isinstance(homeworks, list):
         logger.error("Неверный формат 'homeworks'")
         raise Exception("Неверный формат 'homeworks'")
     if not homeworks:
         logger.error("Нет списка 'homeworks'")
-        raise Exception("Нет списка 'homeworks'")
-    status = homeworks[0]['status']
+        return None
+    homeworks = homeworks[0]
+    status = homeworks['status']
     if status not in HOMEWORK_STATUSES:
         logger.error('Статуст домашки неверен')
         raise Exception("Неправильный статус")
@@ -103,15 +104,16 @@ def main():
     updater = Updater(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
     response = get_api_answer(ENDPOINT, current_timestamp)
-    homework = check_response(response)
-    message = parse_status(homework)
-    updater.dispatcher.add_handler(
-        CommandHandler('homework',
-                       send_message(bot, message))
-    )
     while True:
         try:
-            time.sleep(RETRY_TIME)
+            homework = check_response(response)
+            if homework is not None:
+                message = parse_status(homework)
+                updater.dispatcher.add_handler(
+                    CommandHandler('homework',
+                                   send_message(bot, message))
+                )
+                time.sleep(RETRY_TIME)
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logger.error(message)
