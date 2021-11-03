@@ -59,9 +59,9 @@ def get_api_answer(url, current_timestamp):
 
 def parse_status(homework):
     """Достает данные из домашки, проверяет и возвращает сообщение."""
-    status = homework['status']
+    status = homework.get('status')
     verdict = HOMEWORK_STATUSES[status]
-    homework_name = homework['homework_name']
+    homework_name = homework.get('homework_name')
     if homework_name is None:
         logger.error('Нет имени домашки')
         raise Exception('Нет имени домашки')
@@ -80,7 +80,7 @@ def check_response(response):
     if not homeworks:
         return None
     homeworks = homeworks[0]
-    status = homeworks['status']
+    status = homeworks.get('status')
     if not status:
         return None
     if status not in HOMEWORK_STATUSES:
@@ -104,16 +104,16 @@ def main():
     updater = Updater(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
     response = get_api_answer(ENDPOINT, current_timestamp)
+    homework = check_response(response)
     while True:
         try:
-            homework = check_response(response)
             if homework is not None:
                 message = parse_status(homework)
                 updater.dispatcher.add_handler(
                     CommandHandler('homework',
                                    send_message(bot, message))
                 )
-                time.sleep(RETRY_TIME)
+            time.sleep(RETRY_TIME)
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logger.error(message)
