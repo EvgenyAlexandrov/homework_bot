@@ -81,8 +81,6 @@ def check_response(response):
         return None
     homeworks = homeworks[0]
     status = homeworks.get('status')
-    if not status:
-        return None
     if status not in HOMEWORK_STATUSES:
         logger.error('Статуст домашки неверен')
         raise Exception("Неправильный статус")
