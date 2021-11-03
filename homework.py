@@ -84,13 +84,8 @@ def check_response(response):
     if not status:
         return None
     if status not in HOMEWORK_STATUSES:
-        logger.error('Статус домашки неверен')
+        logger.error('Статуст домашки неверен')
         raise Exception("Неправильный статус")
-    return homeworks
-
-
-def main():
-    """Проверяет токены, запускает функции с выставлением таймера."""
     if TELEGRAM_CHAT_ID is None:
         logger.error('Нет id чата')
         raise Exception('Нет id чата')
@@ -100,6 +95,11 @@ def main():
     if PRACTICUM_TOKEN is None:
         logger.error('Нет токена практикума')
         raise Exception('Нет токена практикума')
+    return homeworks
+
+
+def main():
+    """Запускает функции с выставлением таймера."""
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     updater = Updater(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
