@@ -84,7 +84,7 @@ def check_response(response):
     if not status:
         return None
     if status not in HOMEWORK_STATUSES:
-        logger.error('Статуст домашки неверен')
+        logger.error('Статус домашки неверен')
         raise Exception("Неправильный статус")
     return homeworks
 
@@ -103,10 +103,10 @@ def main():
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     updater = Updater(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
-    response = get_api_answer(ENDPOINT, current_timestamp)
-    homework = check_response(response)
     while True:
         try:
+            response = get_api_answer(ENDPOINT, current_timestamp)
+            homework = check_response(response)
             if homework is not None:
                 message = parse_status(homework)
                 updater.dispatcher.add_handler(
