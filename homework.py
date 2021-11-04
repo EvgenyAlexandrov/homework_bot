@@ -101,16 +101,19 @@ def main():
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     updater = Updater(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
+    status_tmp = ''
     while True:
         try:
             response = get_api_answer(ENDPOINT, current_timestamp)
             homework = check_response(response)
-            if homework is not None:
+            if (homework is not None) and status_tmp != homework['status']:
+                status_tmp = homework['status']
                 message = parse_status(homework)
                 updater.dispatcher.add_handler(
                     CommandHandler('homework',
                                    send_message(bot, message))
                 )
+            logger.info('Изменений нет, ждем 10 мин и проверяем')
             time.sleep(RETRY_TIME)
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
