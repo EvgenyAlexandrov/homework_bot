@@ -12,7 +12,7 @@
 + Установите и активируйте виртуальное окружение c учетом версии Python 3.7 (выбираем python не ниже 3.7):
 ```
 $ py -3.7 -m venv venv
-$ venv/Scripts/activate
+$ source venv/Scripts/activate
 $ python -m pip install --upgrade pip
 ```
   
