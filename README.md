@@ -21,7 +21,7 @@ git clone https://github.com/yandex-praktikum/kittygram.git
 ```
 
 ```
-cd kittygram
+cd homework_bot
 ```
 + Cоздать и активировать виртуальное окружение:
 
