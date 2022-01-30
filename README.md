@@ -8,11 +8,33 @@
 
 ## Запуск проекта в dev-режиме
 
-+ Клонировать репозиторий и перейти в него в командной строке.
-+ Установите и активируйте виртуальное окружение c учетом версии Python 3.7 (выбираем python не ниже 3.7):
+
++ Клонировать репозиторий и перейти в него в командной строке:
+
 ```
-$ py -3.7 -m venv venv
-$ source venv/Scripts/activate
-$ python -m pip install --upgrade pip
+git clone https://github.com/yandex-praktikum/kittygram.git
+```
+
+```
+cd kittygram
+```
++ Cоздать и активировать виртуальное окружение:
+
+```
+python3 -m venv env
+```
+
+```
+source env/bin/activate
+```
+
++ Установить зависимости из файла requirements.txt:
+
+```
+python3 -m pip install --upgrade pip
+```
+
+```
+pip install -r requirements.txt
 ```
   
